@@ -1,0 +1,16 @@
+*.hxproj
+
+.vscode/
+*.code-workspace
+
+build/
+bin/
+dist/
+
+lib/
+lib-esm/
+node_modules/
+
+.DS_Store
+
+feathersui-openfl-*.tgz
