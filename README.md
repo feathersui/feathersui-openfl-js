@@ -31,7 +31,7 @@ Alternatively, Feathers UI may be added to any HTML file using a few `<script>` 
 ```html
 <script src="https://unpkg.com/openfl@8.9.6/dist/openfl.min.js"></script>
 <script src="https://unpkg.com/actuate@1.8.9-beta/dist/actuate.min.js"></script>
-<script src="https://unpkg.com/feathersui-openfl@1.0.0-beta.2/dist/feathersui-openfl.min.js"></script>
+<script src="https://unpkg.com/feathersui-openfl@1.0.0-beta.3/dist/feathersui-openfl.min.js"></script>
 ```
 ### Choose an editor or IDE
 
