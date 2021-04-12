@@ -1,4 +1,4 @@
-# Feathers UI (npm version) 1.0.0-beta.2
+# Feathers UI (npm version) 1.0.0-beta.3
 
 [Feathers UI](https://feathersui.com/) is a cross-platform framework of user interface components for creative frontend projects. It is especially well-suited for games, interactive data visualizations, and other rich, multimedia experiences.
 
