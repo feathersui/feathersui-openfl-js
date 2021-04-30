@@ -11,11 +11,11 @@ module.exports = merge(common, {
 Feathers UI v${package.version}
 https://feathersui.com/
 
-Copyright 2020 Bowler Hat LLC
+Copyright ${new Date().getFullYear()} Bowler Hat LLC
 Released under the MIT license
 */`,
       raw: true,
-      entryOnly: true
-    })
-  ]
+      entryOnly: true,
+    }),
+  ],
 });

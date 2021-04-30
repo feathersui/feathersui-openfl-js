@@ -22,8 +22,7 @@ class JSPropertiesMacro {
 				switch (type) {
 					case TClassDecl(cRef):
 						var c = cRef.get();
-						if(StringTools.startsWith(c.module, "feathers."))
-						{
+						if (StringTools.startsWith(c.module, "feathers.")) {
 							foundTypes.push(c);
 						}
 					default:
@@ -32,15 +31,11 @@ class JSPropertiesMacro {
 			}
 
 			var definePropertiesExpr = "const feathers = require(\"./feathers/index.js\");";
-			for(type in foundTypes)
-			{
+			for (type in foundTypes) {
 				var foundFieldNames:Array<String> = [];
-				for(field in type.fields.get())
-				{
-					if(field.meta.has(":flash.property"))
-					{
-						switch(field.kind)
-						{
+				for (field in type.fields.get()) {
+					if (field.meta.has(":flash.property")) {
+						switch (field.kind) {
 							case FVar(read, write):
 								foundFieldNames.push(field.name);
 							default:
@@ -48,7 +43,7 @@ class JSPropertiesMacro {
 						}
 					}
 				}
-				for(fieldName in foundFieldNames) {
+				for (fieldName in foundFieldNames) {
 					definePropertiesExpr += 'Object.defineProperty(${type.module}.prototype, "${fieldName}", { get: function() { return this.get_${fieldName}() }, set: function(value) { return this.set_${fieldName}(value); } });';
 				}
 			}

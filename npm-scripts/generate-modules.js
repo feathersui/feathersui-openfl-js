@@ -539,10 +539,15 @@ function startCreateLibCjs() {
       while ((foundOtherClasses = findClasses.exec(content))) {
         let otherClassName = foundOtherClasses[1];
         if (fileName != otherClassName) {
-
-          cjsFilePath = _path.resolve(_path.dirname(cjsFilePath), `${otherClassName}.js`);
-          cjsGenFilePath = _path.resolve(_path.dirname(cjsGenFilePath), `${otherClassName}.js`);
-          if(!_fs.existsSync(cjsGenFilePath)) {
+          cjsFilePath = _path.resolve(
+            _path.dirname(cjsFilePath),
+            `${otherClassName}.js`
+          );
+          cjsGenFilePath = _path.resolve(
+            _path.dirname(cjsGenFilePath),
+            `${otherClassName}.js`
+          );
+          if (!_fs.existsSync(cjsGenFilePath)) {
             //if the file doesn't exist, skip it
             //it's probably in a conditional compilation block
             continue;

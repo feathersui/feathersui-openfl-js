@@ -33,6 +33,7 @@ Alternatively, Feathers UI may be added to any HTML file using a few `<script>` 
 <script src="https://unpkg.com/actuate@1.8.9-beta/dist/actuate.min.js"></script>
 <script src="https://unpkg.com/feathersui-openfl@1.0.0-beta.3a/dist/feathersui-openfl.min.js"></script>
 ```
+
 ### Choose an editor or IDE
 
 [Visual Studio Code](https://code.visualstudio.com/) is recommended, but any editor or IDE that supports JavaScript should work with Feathers UI.
@@ -49,16 +50,21 @@ class HelloWorld extends feathers.controls.Application {
     this.button = new feathers.controls.Button();
     this.button.layoutData = feathers.layout.AnchorLayoutData.center();
     this.button.text = "Click Me";
-    this.button.addEventListener(feathers.events.TriggerEvent.TRIGGER, this.button_triggerHandler);
+    this.button.addEventListener(
+      feathers.events.TriggerEvent.TRIGGER,
+      this.button_triggerHandler
+    );
     this.addChild(this.button);
   }
 
   button_triggerHandler = (event) => {
     feathers.controls.TextCallout.show("Hello World", this.button);
-  }
+  };
 }
 
-var stage = new openfl.display.Stage(0, 0, null, HelloWorld, {allowHighDPI: true});
+var stage = new openfl.display.Stage(0, 0, null, HelloWorld, {
+  allowHighDPI: true,
+});
 document.body.appendChild(stage.element);
 ```
 
