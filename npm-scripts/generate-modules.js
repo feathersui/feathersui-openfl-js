@@ -19,11 +19,10 @@ let DelayFS = init();
 let delayFS = new DelayFS(false);
 
 // Settings
-const srcDirname = 'src'
 const libCjsDirname = 'lib';
 const baseDir = '..';
 
-let srcDirPath = _path.resolve(baseDir, srcDirname);
+let srcDirPath = _path.resolve(baseDir, _path.join('node_modules', 'feathersui-openfl-haxelib', 'src'));
 let srcFeathersDirPath = _path.resolve(srcDirPath, 'feathers');
 let libCjsDirPath = _path.resolve(baseDir, libCjsDirname);
 let libCjsGenDirPath = _path.resolve(libCjsDirPath, '_gen');
