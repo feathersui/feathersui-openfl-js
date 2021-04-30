@@ -62,10 +62,11 @@ class HelloWorld extends feathers.controls.Application {
   };
 }
 
-var stage = new openfl.display.Stage(0, 0, null, HelloWorld, {
+var stage = new openfl.display.Stage(0, 0, null, null, {
   allowHighDPI: true,
 });
 document.body.appendChild(stage.element);
+stage.addChild(new HelloWorld());
 ```
 
 ## Help & Support
