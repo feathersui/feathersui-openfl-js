@@ -1,4 +1,5 @@
 const webpack = require("webpack");
+const TerserPlugin = require("terser-webpack-plugin");
 const { merge } = require("webpack-merge");
 const BrotliPlugin = require("brotli-webpack-plugin");
 const CompressionPlugin = require("compression-webpack-plugin");
@@ -15,6 +16,9 @@ module.exports = merge(common, {
       banner: `/*! Feathers UI v${package.version} | © Bowler Hat LLC | feathersui.com */`,
       raw: true,
       entryOnly: true,
+    }),
+    new TerserPlugin({
+      extractComments: false,
     }),
     new CompressionPlugin({
       include: /[A-Za-z0-9]*\.min\.js$/,
