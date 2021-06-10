@@ -21,4 +21,5 @@
 -D howlerjs
 --remap flash:openfl
 --macro JSPropertiesMacro.defineProperties()
+--macro PatchMacro.applyPatch()
 --no-inline
