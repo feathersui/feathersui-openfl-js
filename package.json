@@ -1,6 +1,6 @@
 {
   "name": "feathersui-openfl",
-  "version": "1.0.0-beta.4",
+  "version": "1.0.0-beta.5",
   "description": "Feathers UI is a cross-platform framework of user interface components for creative frontend projects. It is especially well-suited for games, interactive data visualizations, and other rich, multimedia experiences. With Feathers UI, you can create native apps for a wide range of devices and platforms — including phones, tablets, desktop computers, game consoles… and you can even deploy to web browsers.",
   "repository": "https://github.com/BowlerHatLLC/feathersui-openfl.git",
   "keywords": [
@@ -33,7 +33,7 @@
     "webpack-merge": "^5.8.0",
     "lime-haxelib": "openfl/lime#7.6.2",
     "openfl-haxelib": "openfl/openfl#8.9.7",
-    "feathersui-openfl-haxelib": "BowlerHatLLC/feathersui-openfl#v1.0.0-beta.4"
+    "feathersui-openfl-haxelib": "BowlerHatLLC/feathersui-openfl#v1.0.0-beta.5"
   },
   "haxeDependencies": {
     "haxe": "4.0.0"
