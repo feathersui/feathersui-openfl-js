@@ -1,6 +1,6 @@
 {
   "name": "feathersui-openfl",
-  "version": "1.0.0-beta.5",
+  "version": "1.0.0-beta.6",
   "description": "Feathers UI is a cross-platform framework of user interface components for creative frontend projects. It is especially well-suited for games, interactive data visualizations, and other rich, multimedia experiences. With Feathers UI, you can create native apps for a wide range of devices and platforms — including phones, tablets, desktop computers, game consoles… and you can even deploy to web browsers.",
   "repository": "https://github.com/BowlerHatLLC/feathersui-openfl.git",
   "keywords": [
@@ -24,16 +24,16 @@
   },
   "devDependencies": {
     "brotli-webpack-plugin": "^1.1.0",
-    "compression-webpack-plugin": "^8.0.0",
-    "globby": "^11.0.3",
+    "compression-webpack-plugin": "^9.0.0",
+    "globby": "^11.0.4",
     "haxe": "^5.2.1",
     "hxgenjs": "kevinresol/hxgenjs",
-    "webpack": "^5.39.0",
-    "webpack-cli": "^4.7.2",
+    "webpack": "^5.56.1",
+    "webpack-cli": "^4.8.0",
     "webpack-merge": "^5.8.0",
     "lime-haxelib": "openfl/lime#7.6.2",
     "openfl-haxelib": "openfl/openfl#8.9.7",
-    "feathersui-openfl-haxelib": "BowlerHatLLC/feathersui-openfl#v1.0.0-beta.5"
+    "feathersui-openfl-haxelib": "BowlerHatLLC/feathersui-openfl#v1.0.0-beta.6"
   },
   "haxeDependencies": {
     "haxe": "4.0.0"
