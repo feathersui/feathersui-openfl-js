@@ -17,14 +17,13 @@ jobs:
       - uses: krdlab/setup-haxe@v1
         with:
           haxe-version: 4.0.5
-      - name: Set up Haxe
+      - name: Set up Haxelib
         run: |
           mkdir $GITHUB_WORKSPACE/.haxelib
           haxelib setup $GITHUB_WORKSPACE/.haxelib
-      - name: Set up Node.js
-        uses: actions/setup-node@v1
+      - uses: actions/setup-node@v2
         with:
-          node-version: v16.x
+          node-version: "16"
       - name: Install npm dependencies
         run: npm ci
       - name: Build npm module
