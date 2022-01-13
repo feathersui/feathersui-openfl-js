@@ -34,13 +34,13 @@ class JSPropertiesMacro {
 			for (type in foundTypes) {
 				var foundFieldNames:Array<String> = [];
 				for (field in type.fields.get()) {
-					if (field.meta.has(":flash.property")) {
-						switch (field.kind) {
-							case FVar(read, write):
+					switch (field.kind) {
+						case FVar(read, write):
+							if ((read.equals(AccCall) || write.match(AccCall))) {
 								foundFieldNames.push(field.name);
-							default:
-								continue;
-						}
+							}
+						default:
+							continue;
 					}
 				}
 				for (fieldName in foundFieldNames) {
