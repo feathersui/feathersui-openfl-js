@@ -1,14 +1,8 @@
-# Feathers UI (npm version) 1.0.0-beta.9
+# Feathers UI (npm version) 1.0.0-rc.1
 
 [Feathers UI](https://feathersui.com/) is a cross-platform framework of user interface components for creative frontend projects. It is especially well-suited for games, interactive data visualizations, and other rich, multimedia experiences.
 
-This version of Feathers UI is intended for JavaScript developers.
-
----
-
-🚨 **Notice:** This is a **beta** version of Feathers UI for OpenFL. Some components and features may still be missing, and occasional bugs should be expected.
-
----
+⚠️ This version of Feathers UI is intended for JavaScript developers. It's not as actively tested as the Haxe version of the same library, and some bugs should be expected.
 
 ## Get started
 
@@ -31,7 +25,7 @@ Alternatively, Feathers UI may be added to any HTML file using a few `<script>` 
 ```html
 <script src="https://unpkg.com/openfl@8.9.6/dist/openfl.min.js"></script>
 <script src="https://unpkg.com/actuate@1.8.9-beta/dist/actuate.min.js"></script>
-<script src="https://unpkg.com/feathersui-openfl@1.0.0-beta.9/dist/feathersui-openfl.min.js"></script>
+<script src="https://unpkg.com/feathersui-openfl@1.0.0-rc.1/dist/feathersui-openfl.min.js"></script>
 ```
 
 ### Choose an editor or IDE
