@@ -1,4 +1,4 @@
-# Feathers UI (npm version) 1.0.0
+# Feathers UI (npm version) 1.1.0
 
 [Feathers UI](https://feathersui.com/) is a framework of graphical user interface (GUI) components for creative, cross-platform, frontend projects. It is especially well-suited for games, interactive data visualizations, and other rich, multimedia experiences.
 
@@ -25,7 +25,7 @@ Alternatively, Feathers UI may be added to any HTML file using a few `<script>` 
 ```html
 <script src="https://unpkg.com/openfl@8.9.6/dist/openfl.min.js"></script>
 <script src="https://unpkg.com/actuate@1.8.9-beta/dist/actuate.min.js"></script>
-<script src="https://unpkg.com/feathersui-openfl@1.0.0/dist/feathersui-openfl.min.js"></script>
+<script src="https://unpkg.com/feathersui-openfl@1.1.0/dist/feathersui-openfl.min.js"></script>
 ```
 
 ### Choose an editor or IDE
