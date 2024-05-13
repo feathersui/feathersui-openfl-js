@@ -23,8 +23,8 @@ This command will also automatically install any additional required dependencie
 Alternatively, Feathers UI may be added to any HTML file using a few `<script>` tags:
 
 ```html
-<script src="https://unpkg.com/openfl@8.9.6/dist/openfl.min.js"></script>
-<script src="https://unpkg.com/actuate@1.8.9-beta/dist/actuate.min.js"></script>
+<script src="https://unpkg.com/openfl@9.3.3/dist/openfl.min.js"></script>
+<script src="https://unpkg.com/actuate@1.9.0/dist/actuate.min.js"></script>
 <script src="https://unpkg.com/feathersui-openfl@1.2.0/dist/feathersui-openfl.min.js"></script>
 ```
 
