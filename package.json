@@ -19,7 +19,7 @@
     "dist"
   ],
   "dependencies": {
-    "actuate": "^1.8.9-beta",
+    "actuate": "^1.9.0",
     "openfl": "^8.9.6"
   },
   "devDependencies": {
@@ -33,7 +33,7 @@
     "webpack-merge": "^5.8.0",
     "lime-haxelib": "openfl/lime#7.6.2",
     "openfl-haxelib": "openfl/openfl#8.9.7",
-    "feathersui-openfl-haxelib": "feathersui/feathersui-openfl#v1.2.0"
+    "feathersui-openfl-haxelib": "feathersui/feathersui-openfl#v1.3.0"
   },
   "haxeDependencies": {
     "haxe": "4.0.0"
