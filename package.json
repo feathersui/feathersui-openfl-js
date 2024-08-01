@@ -1,6 +1,6 @@
 {
   "name": "feathersui-openfl",
-  "version": "1.2.0",
+  "version": "1.3.0",
   "description": "Feathers UI is a cross-platform framework of user interface components for creative frontend projects. It is especially well-suited for games, interactive data visualizations, and other rich, multimedia experiences. With Feathers UI, you can create native apps for a wide range of devices and platforms — including phones, tablets, desktop computers, game consoles… and you can even deploy to web browsers.",
   "repository": "https://github.com/feathersui/feathersui-openfl-js.git",
   "keywords": [
@@ -20,26 +20,28 @@
   ],
   "dependencies": {
     "actuate": "^1.9.0",
-    "openfl": "^8.9.6"
+    "openfl": "^9.3.4"
   },
   "devDependencies": {
     "brotli-webpack-plugin": "^1.1.0",
-    "compression-webpack-plugin": "^9.2.0",
-    "globby": "^11.0.4",
+    "compression-webpack-plugin": "^11.1.0",
+    "del-cli": "^5.1.0",
+    "feathersui-openfl-haxelib": "feathersui/feathersui-openfl#v1.3.0",
+    "globby": "^11.1.0",
     "haxe": "^5.2.1",
     "hxgenjs": "kevinresol/hxgenjs#7608d34f",
-    "webpack": "^5.65.0",
-    "webpack-cli": "^4.9.1",
-    "webpack-merge": "^5.8.0",
-    "lime-haxelib": "openfl/lime#7.6.2",
-    "openfl-haxelib": "openfl/openfl#8.9.7",
-    "feathersui-openfl-haxelib": "feathersui/feathersui-openfl#v1.3.0"
+    "lime-haxelib": "openfl/lime#8.1.3",
+    "openfl-haxelib": "openfl/openfl#9.3.4",
+    "webpack": "^5.93.0",
+    "webpack-cli": "^5.1.4",
+    "webpack-merge": "^6.0.1"
   },
   "haxeDependencies": {
-    "haxe": "4.0.0"
+    "haxe": "4.0.5"
   },
   "scripts": {
-    "build": "npm run build-lib && npm run gen-lib && npm run build-dist",
+    "build": "npm run clean && npm run build-lib && npm run gen-lib && npm run build-dist",
+    "clean": "del lib/_gen/ lib/feathers/ dist/",
     "gen-lib": "cd npm-scripts && node generate-modules gen-lib",
     "build-lib": "cd npm-scripts && haxe js-lib.hxml && node generate-modules fix-npm-libs",
     "build-lib-esm": "cd npm-scripts && node generate-modules gen-esm",

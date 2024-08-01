@@ -1,53 +1,53 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <meta
-      id="viewport"
-      name="viewport"
-      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
-    />
-    <title>Hello World — Feathers UI Samples (JavaScript)</title>
-    <style>
-      html,
-      body {
-        margin: 0;
-        padding: 0;
-        height: 100%;
-        overflow: hidden;
-      }
-    </style>
-  </head>
-  <body>
-    <script src="https://unpkg.com/openfl@8.9.6/dist/openfl.min.js"></script>
-    <script src="https://unpkg.com/actuate@1.8.9-beta/dist/actuate.min.js"></script>
-    <script src="../../dist/feathersui-openfl.min.js"></script>
-    <script>
-      class HelloWorld extends feathers.controls.Application {
-        constructor() {
-          super();
 
-          this.layout = new feathers.layout.AnchorLayout();
+<head>
+  <meta charset="utf-8" />
+  <meta id="viewport" name="viewport"
+    content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Hello World — Feathers UI Samples (JavaScript)</title>
+  <style>
+    html,
+    body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      overflow: hidden;
+    }
+  </style>
+</head>
 
-          this.button = new feathers.controls.Button();
-          this.button.layoutData = feathers.layout.AnchorLayoutData.center();
-          this.button.text = "Click Me";
-          this.button.addEventListener(
-            feathers.events.TriggerEvent.TRIGGER,
-            this.button_triggerHandler
-          );
-          this.addChild(this.button);
-        }
+<body>
+  <script src="https://unpkg.com/openfl@9.3.4/dist/openfl.min.js"></script>
+  <script src="https://unpkg.com/actuate@1.9.0/dist/actuate.min.js"></script>
+  <script src="../../dist/feathersui-openfl.min.js"></script>
+  <script>
+    class HelloWorld extends feathers.controls.Application {
+      constructor() {
+        super();
 
-        button_triggerHandler = (event) => {
-          feathers.controls.TextCallout.show("Hello World", this.button);
-        };
+        this.layout = new feathers.layout.AnchorLayout();
+
+        this.button = new feathers.controls.Button();
+        this.button.layoutData = feathers.layout.AnchorLayoutData.center();
+        this.button.text = "Click Me";
+        this.button.addEventListener(
+          feathers.events.TriggerEvent.TRIGGER,
+          this.button_triggerHandler
+        );
+        this.addChild(this.button);
       }
 
-      var stage = new openfl.display.Stage(0, 0, null, HelloWorld, {
-        allowHighDPI: true,
-      });
-      document.body.appendChild(stage.element);
-    </script>
-  </body>
+      button_triggerHandler = (event) => {
+        feathers.controls.TextCallout.show("Hello World", this.button);
+      };
+    }
+
+    var stage = new openfl.display.Stage(0, 0, null, HelloWorld, {
+      allowHighDPI: true,
+    });
+    document.body.appendChild(stage.element);
+  </script>
+</body>
+
 </html>

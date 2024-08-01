@@ -1,8 +1,8 @@
 -js ../lib/_gen/_.js
 --macro include("feathers")
 -cp ../node_modules/feathersui-openfl-haxelib/src
--D lime=7.6.2
--D openfl=8.9.7
+-D lime=8.1.3
+-D openfl=9.3.4
 -D actuate=1.9.0
 -cp ../node_modules/lime-haxelib/src
 -cp ../node_modules/openfl-haxelib/src
