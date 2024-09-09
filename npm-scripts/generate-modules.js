@@ -685,7 +685,7 @@ function processCjsModule(moduleFilePath) {
         content.substr(result.index + result[0].length);
     }
 
-    let findCall = new RegExp(`(${ns}(_\\w+)+\\(\\))\\.default`);
+    let findCall = new RegExp(`(${ns}(_[\\$\\w]+)+\\(\\))\\.default`);
     while ((result = content.match(findCall))) {
       content =
         content.substr(0, result.index) +
