@@ -9,9 +9,22 @@ import haxe.macro.Context;
 
 class AS3ExternsGenerator {
 	private static final ALWAYS_ALLOWED_REFERENCE_TYPES = [
-		"Any", "Array", "Bool", "Class", "Date", "Dynamic", "Float", "Int", "String", "UInt", "Void"
+		"Any",
+		"Array",
+		"Bool",
+		"Class",
+		"Date",
+		"Dynamic",
+		"Float",
+		"Int",
+		"String",
+		"UInt",
+		"Void"
 	];
 	private static final NON_NULLABLE_AS3_TYPES = ["Boolean", "Number", "int", "uint"];
+	// AS3 in Royale allows most keywords as symbol names, unlike older SDKs
+	// however, these are still not allowed
+	private static final DISALLOWED_AS3_NAMES = ["goto", "public", "private", "protected", "internal"];
 	private static final eregAccessor = ~/^(g|s)et_[\w]+$/;
 
 	private static function rewriteQname(qname:String):String {
@@ -89,7 +102,7 @@ class AS3ExternsGenerator {
 					var generated = generateAbstractEnum(abstractType, params);
 					writeGenerated(outputDirPath, abstractType, generated);
 				case TType(t, params):
-				// ignore typedefs because they don't exist in openfl-js
+					// ignore typedefs because they don't exist in openfl-js
 				default:
 					trace("Unexpected type: " + type);
 			}
@@ -349,6 +362,10 @@ class AS3ExternsGenerator {
 				}
 				switch (classField.type) {
 					case TFun(args, ret):
+						var argsAndRet = {args: args, ret: ret};
+						findInterfaceArgsAndRet(classField, classType, argsAndRet);
+						args = argsAndRet.args;
+						ret = argsAndRet.ret;
 						result.add('(');
 						var hadOpt = false;
 						for (i in 0...args.length) {
@@ -413,6 +430,9 @@ class AS3ExternsGenerator {
 				}
 			case FVar(read, write):
 				var isAccessor = read == AccCall || write == AccCall || mustBeAccessor(classField.name, interfaces);
+				var argsAndRet = {args: [], ret: classField.type};
+				findInterfaceArgsAndRet(classField, classType, argsAndRet);
+				var ret = argsAndRet.ret;
 				if (isAccessor) {
 					var hasGetter = read == AccCall || read == AccNormal;
 					var hasSetter = write == AccCall || write == AccNormal;
@@ -426,10 +446,10 @@ class AS3ExternsGenerator {
 						result.add('function get ');
 						result.add(classField.name);
 						result.add('():');
-						var retQname = if (shouldSkipMacroType(classField.type, true)) {
+						var retQname = if (shouldSkipMacroType(ret, true)) {
 							'*';
 						} else {
-							macroTypeToQname(classField.type);
+							macroTypeToQname(ret);
 						}
 						result.add(retQname);
 						switch (retQname) {
@@ -456,10 +476,10 @@ class AS3ExternsGenerator {
 						result.add('function set ');
 						result.add(classField.name);
 						result.add('(value:');
-						if (shouldSkipMacroType(classField.type, true)) {
+						if (shouldSkipMacroType(ret, true)) {
 							result.add('*');
 						} else {
-							result.add(macroTypeToQname(classField.type));
+							result.add(macroTypeToQname(ret));
 						}
 						result.add('):void {}');
 					}
@@ -477,10 +497,10 @@ class AS3ExternsGenerator {
 					}
 					result.add(classField.name);
 					result.add(':');
-					if (shouldSkipMacroType(classField.type, true)) {
+					if (shouldSkipMacroType(ret, true)) {
 						result.add('*');
 					} else {
-						result.add(macroTypeToQname(classField.type));
+						result.add(macroTypeToQname(ret));
 					}
 					if (classField.isFinal || read == AccInline || write == AccInline) {
 						var expr = classField.expr().expr;
@@ -909,7 +929,10 @@ class AS3ExternsGenerator {
 
 	private function shouldSkipField(classField:ClassField, classType:ClassType):Bool {
 		if (classField.name != "new") {
-			if (!classField.isPublic || classField.isExtern || classField.meta.has(":noCompletion")) {
+			if (!classField.isPublic
+				|| classField.isExtern
+				|| classField.meta.has(":noCompletion")
+				|| DISALLOWED_AS3_NAMES.indexOf(classField.name) != -1) {
 				return true;
 			}
 		}
@@ -1004,7 +1027,7 @@ class AS3ExternsGenerator {
 					var classType = t.get();
 					switch (classType.kind) {
 						case KTypeParameter(constraints):
-							return "Object";
+							return "*";
 						default:
 					}
 					return baseTypeToQname(classType, includeParams ? params : []);
@@ -1161,6 +1184,43 @@ class AS3ExternsGenerator {
 		var qname = baseTypeToQname(baseType, []);
 		var relativePath = qname.split(".").join("/") + ".as";
 		return Path.join([dirPath, relativePath]);
+	}
+
+	/**
+		Haxe allows classes to implement methods from interfaces with more
+		specific types, but AS3 does not. This method finds the original types
+		from the interface that are required to match.
+	**/
+	private function findInterfaceArgsAndRet(classField:ClassField, classType:ClassType,
+			argsAndRet:{args:Array<{name:String, opt:Bool, t:Type}>, ret:Type}):Void {
+		var currentClassType = classType;
+		while (currentClassType != null) {
+			for (currentInterface in currentClassType.interfaces) {
+				for (interfaceField in currentInterface.t.get().fields.get()) {
+					if (interfaceField.name == classField.name) {
+						switch (interfaceField.kind) {
+							case FMethod(k):
+								switch (interfaceField.type) {
+									case TFun(interfaceArgs, interfaceRet):
+										argsAndRet.args = interfaceArgs;
+										argsAndRet.ret = interfaceRet;
+										return;
+									default:
+								}
+							case FVar(read, write):
+								argsAndRet.ret = interfaceField.type;
+							default:
+						}
+					}
+				}
+			}
+
+			if (currentClassType.superClass != null) {
+				currentClassType = currentClassType.superClass.t.get();
+			} else {
+				currentClassType = null;
+			}
+		}
 	}
 }
 

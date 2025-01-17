@@ -24,4 +24,5 @@
 --remap flash:openfl
 --macro JSPropertiesMacro.defineProperties()
 --macro PatchMacro.applyPatch()
+--macro AS3ExternsGenerator.generate({outputPath: "../lib", includedPackages: ["feathers"], allowedPackageReferences: ["openfl"], renameSymbols: ["openfl.VectorData", "openfl.Vector", "openfl.utils.ByteArrayData", "openfl.utils.ByteArray"]})
 --no-inline

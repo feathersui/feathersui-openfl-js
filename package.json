@@ -23,6 +23,7 @@
     "openfl": "^9.3.4"
   },
   "devDependencies": {
+    "@apache-royale/royale-js": "^0.9.8",
     "brotli-webpack-plugin": "^1.1.0",
     "compression-webpack-plugin": "^11.1.0",
     "del-cli": "^5.1.0",
@@ -45,6 +46,7 @@
     "gen-lib": "cd npm-scripts && node generate-modules gen-lib",
     "build-lib": "cd npm-scripts && haxe js-lib.hxml && node generate-modules fix-npm-libs",
     "build-lib-esm": "cd npm-scripts && node generate-modules gen-esm",
+    "build-swc": "compc -load-config=node_modules/@apache-royale/royale-js/royale-asjs/frameworks/js-config.xml -keep-as3-metadata=JSModule -include-sources=lib -compiler.targets=SWF,JS -warnings=false -external-library-path+=node_modules/openfl/dist/openfl.swc -allow-subclass-overrides=true -output=dist/feathersui-royale-typedefs.swc",
     "build-dist": "npm run build-dist:dev && npm run build-dist:prod",
     "build-dist:dev": "webpack --config webpack.dev.js",
     "build-dist:prod": "webpack --config webpack.prod.js"
