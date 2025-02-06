@@ -133,7 +133,14 @@ class TSExternsGenerator {
 		while (type != null) {
 			switch (type) {
 				case TInst(t, params):
-					baseType = t.get();
+					var classType = t.get();
+					switch (classType.kind) {
+						case KTypeParameter(constraints):
+							// don't let Vector<T> become Vector<any>
+							return false;
+						default:
+					}
+					baseType = classType;
 					break;
 				case TEnum(t, params):
 					baseType = t.get();
@@ -181,13 +188,13 @@ class TSExternsGenerator {
 		if (asReference && baseType.pack.length == 0 && ALWAYS_ALLOWED_REFERENCE_TYPES.indexOf(baseType.name) != -1) {
 			return false;
 		}
-
+		
 		if (baseType.isPrivate || (baseType.isExtern && !asReference) || isInHiddenPackage(baseType.pack)) {
 			return true;
 		}
 		final qname = baseTypeToQname(baseType, [], false);
 		if ((options == null || options.renameSymbols == null || options.renameSymbols.indexOf(qname) == -1)
-			&& baseType.meta.has(":noCompletion")) {
+				&& baseType.meta.has(":noCompletion")) {
 			return true;
 		}
 		if (options != null) {
@@ -352,7 +359,7 @@ class TSExternsGenerator {
 		if (doc == null || StringTools.trim(doc).length == 0) {
 			return "";
 		}
-
+		
 		var result = new StringBuf();
 		result.add('$indent/**\n');
 		var lines = ~/\r?\n/g.split(doc);
@@ -953,9 +960,9 @@ class TSExternsGenerator {
 							result.add(generateInitExpression(classField));
 							result.add(',\n');
 						}
-					// TODO: if TypeScript will unify enums and interfaces,
-					// with the same name, we should be able to put other
-					// types of vars and methods into an interface.
+						// TODO: if TypeScript will unify enums and interfaces,
+						// with the same name, we should be able to put other
+						// types of vars and methods into an interface.
 					default:
 				}
 			}
@@ -1274,7 +1281,7 @@ class TSExternsGenerator {
 		}
 
 		if (QNAMES_TO_REWRITE.exists(qname)) {
-			return QNAMES_TO_REWRITE.get(qname);
+			qname = QNAMES_TO_REWRITE.get(qname);
 		}
 
 		if (!includeParams || params.length == 0) {
@@ -1311,7 +1318,7 @@ class TSExternsGenerator {
 		}
 
 		if (QNAMES_TO_REWRITE.exists(qname)) {
-			return QNAMES_TO_REWRITE.get(qname);
+			qname = QNAMES_TO_REWRITE.get(qname);
 		}
 
 		var foundImportMapping = false;
@@ -1340,13 +1347,12 @@ class TSExternsGenerator {
 		return buffer.toString();
 	}
 
-	private function abstractTypeToUnqualifiedName(abstractType:AbstractType, params:Array<Type>, includeParams:Bool = true):String {
+	private function abstractTypeToUnqualifiedName(abstractType:AbstractType, abstractTypeParams:Array<Type>, includeParams:Bool = true):String {
 		if (abstractType.meta.has(":enum") && !shouldSkipBaseType(abstractType, true)) {
-			return baseTypeToUnqualifiedName(abstractType, params, includeParams);
+			return baseTypeToUnqualifiedName(abstractType, abstractTypeParams, includeParams);
 		}
-		var pack = abstractType.pack;
-		if (abstractType.name == "Null" && pack.length == 0) {
-			return macroTypeToUnqualifiedName(params[0], includeParams);
+		if (abstractType.name == "Null" && abstractType.pack.length == 0) {
+			return macroTypeToUnqualifiedName(abstractTypeParams[0], includeParams);
 		}
 		if (abstractType.name == "Function" && abstractType.pack.length == 1 && abstractType.pack[0] == "haxe") {
 			return "Function";
@@ -1354,43 +1360,44 @@ class TSExternsGenerator {
 		var underlyingType = abstractType.type;
 		switch (underlyingType) {
 			case TAbstract(t, underlyingParams):
-				var result = baseTypeToQname(abstractType, params, false);
+				var result = baseTypeToQname(abstractType, abstractTypeParams, false);
 				var compareTo = baseTypeToQname(t.get(), underlyingParams, false);
 				if (result == compareTo) {
 					// this avoids an infinite loop
-					return baseTypeToUnqualifiedName(abstractType, params, includeParams);
+					return baseTypeToUnqualifiedName(abstractType, abstractTypeParams, includeParams);
 				}
 			default:
 		}
-
+		
 		if (includeParams) {
-			var qname = macroTypeToQname(underlyingType, false);
-			if (options != null && options.renameSymbols != null) {
-				var renameSymbols = options.renameSymbols;
-				var i = 0;
-				while (i < renameSymbols.length) {
-					var originalName = renameSymbols[i];
-					i++;
-					var newName = renameSymbols[i];
-					i++;
-					if (newName == qname) {
-						// don't use underlyingType's parameters
-						return macroTypeToUnqualifiedName(underlyingType, false) + generateUnqualifiedParams(params);
-					}
-				}
+			var abstractTypeQname = baseTypeToQname(abstractType, abstractTypeParams, false);
+			var paramsToInclude:Array<Type> = null;
+			switch (underlyingType) {
+				case TInst(t, underlyingTypeParams):
+					paramsToInclude = underlyingTypeParams.map((param) -> {
+						return translateTypeParam(param, abstractTypeQname, abstractType.params, abstractTypeParams);
+					});
+				case TAbstract(t, underlyingTypeParams):
+					paramsToInclude = underlyingTypeParams;
+				case TEnum(t, underlyingTypeParams):
+					paramsToInclude = underlyingTypeParams;
+				case TType(t, underlyingTypeParams):
+					paramsToInclude = underlyingTypeParams;
+				default:
+					paramsToInclude = [];
 			}
+			return macroTypeToUnqualifiedName(underlyingType, false) + generateUnqualifiedParams(paramsToInclude);
 		}
 
-		return macroTypeToUnqualifiedName(underlyingType, includeParams);
+		return macroTypeToUnqualifiedName(underlyingType, false);
 	}
 
-	private function abstractTypeToQname(abstractType:AbstractType, params:Array<Type>, includeParams:Bool = true):String {
+	private function abstractTypeToQname(abstractType:AbstractType, abstractTypeParams:Array<Type>, includeParams:Bool = true):String {
 		if (abstractType.meta.has(":enum") && !shouldSkipBaseType(abstractType, true)) {
-			return baseTypeToQname(abstractType, params, includeParams);
+			return baseTypeToQname(abstractType, abstractTypeParams, includeParams);
 		}
-		var pack = abstractType.pack;
-		if (abstractType.name == "Null" && pack.length == 0) {
-			return macroTypeToQname(params[0], includeParams);
+		if (abstractType.name == "Null" && abstractType.pack.length == 0) {
+			return macroTypeToQname(abstractTypeParams[0], includeParams);
 		}
 		if (abstractType.name == "Function" && abstractType.pack.length == 1 && abstractType.pack[0] == "haxe") {
 			return "Function";
@@ -1398,34 +1405,58 @@ class TSExternsGenerator {
 		var underlyingType = abstractType.type;
 		switch (underlyingType) {
 			case TAbstract(t, underlyingParams):
-				var result = baseTypeToQname(abstractType, params, false);
+				var result = baseTypeToQname(abstractType, abstractTypeParams, false);
 				var compareTo = baseTypeToQname(t.get(), underlyingParams, false);
 				if (result == compareTo) {
 					// this avoids an infinite loop
-					return baseTypeToQname(abstractType, params, includeParams);
+					return baseTypeToQname(abstractType, abstractTypeParams, includeParams);
 				}
 			default:
 		}
-
+		
 		if (includeParams) {
-			var qname = macroTypeToQname(underlyingType, false);
-			if (options != null && options.renameSymbols != null) {
-				var renameSymbols = options.renameSymbols;
-				var i = 0;
-				while (i < renameSymbols.length) {
-					var originalName = renameSymbols[i];
-					i++;
-					var newName = renameSymbols[i];
-					i++;
-					if (newName == qname) {
-						// don't use underlyingType's parameters
-						return qname + generateQnameParams(params);
-					}
-				}
+			var abstractTypeQname = baseTypeToQname(abstractType, abstractTypeParams, false);
+			var paramsToInclude:Array<Type> = null;
+			switch (underlyingType) {
+				case TInst(t, underlyingTypeParams):
+					paramsToInclude = underlyingTypeParams.map((param) -> {
+						return translateTypeParam(param, abstractTypeQname, abstractType.params, abstractTypeParams);
+					});
+				case TAbstract(t, underlyingTypeParams):
+					paramsToInclude = underlyingTypeParams;
+				case TEnum(t, underlyingTypeParams):
+					paramsToInclude = underlyingTypeParams;
+				case TType(t, underlyingTypeParams):
+					paramsToInclude = underlyingTypeParams;
+				default:
+					paramsToInclude = [];
 			}
+			return macroTypeToQname(underlyingType, false) + generateQnameParams(paramsToInclude);
 		}
 
 		return macroTypeToQname(underlyingType, includeParams);
+	}
+	
+	private function translateTypeParam(typeParam:Type, typeParametersQname:String, typeParameters:Array<TypeParameter>, params:Array<Type>):Type {
+		switch (typeParam) {
+			case TInst(t, _):
+				var classType = t.get();
+				switch (classType.kind) {
+					case KTypeParameter(constraints):
+						var typeParamSourceQname = classType.pack.join(".");
+						if (typeParamSourceQname == typeParametersQname) {
+							for (j in 0...typeParameters.length) {
+								var param = typeParameters[j];
+								if (param.name == classType.name) {
+									return params[j];
+								}
+							}
+						}
+					default:
+				}
+			default:
+		}
+		return typeParam;
 	}
 
 	private function writeGenerated(outputDirPath:String, baseType:BaseType, generated:String):Void {
@@ -1444,31 +1475,31 @@ class TSExternsGenerator {
 
 	private function relativizePath(path:String, relativeToPath:String):String {
 		var currentPath = path;
-		var stack:Array<String> = [];
-		stack.push(Path.withoutDirectory(currentPath));
-		var currentPath = Path.directory(currentPath);
-		while (currentPath.length > 0) {
-			if (StringTools.startsWith(relativeToPath, currentPath + "/")) {
-				var relativeRelativeToFile = relativeToPath.substring(currentPath.length + 1);
-				var separatorCount = relativeRelativeToFile.length - ~/\//g.replace(relativeRelativeToFile, "").length;
-				var result = "";
-				while (separatorCount > 0) {
-					result += "../";
-					separatorCount--;
-				}
-				while (stack.length > 0) {
-					result += stack.pop();
-				}
+        var stack:Array<String> = [];
+        stack.push(Path.withoutDirectory(currentPath));
+        var currentPath = Path.directory(currentPath);
+        while (currentPath.length > 0) {
+            if (StringTools.startsWith(relativeToPath, currentPath + "/")) {
+                var relativeRelativeToFile = relativeToPath.substring(currentPath.length + 1);
+                var separatorCount = relativeRelativeToFile.length - ~/\//g.replace(relativeRelativeToFile, "").length;
+                var result = "";
+                while (separatorCount > 0) {
+                    result += "../";
+                    separatorCount--;
+                }
+                while (stack.length > 0) {
+                    result += stack.pop();
+                }
 				if (!StringTools.startsWith(result, ".")) {
 					result = "./" + result;
 				}
-				return result;
-			}
-			stack.push(Path.withoutDirectory(currentPath) + "/");
-			currentPath = Path.directory(currentPath);
-		}
-		return "";
-	}
+                return result;
+            }
+            stack.push(Path.withoutDirectory(currentPath) + "/");
+            currentPath = Path.directory(currentPath);
+        }
+        return "";
+    }
 }
 
 typedef TSGeneratorOptions = {
