@@ -73,4 +73,5 @@ stage.addChild(new HelloWorld());
 ## News & Updates
 
 - [Blog](https://feathersui.com/blog/)
-- [Twitter](https://twitter.com/feathersui)
+- [Mastodon](https://fosstodon.org/@feathersui)
+- [Bluesky](https://bsky.app/profile/feathersui.bsky.social)
