@@ -19,6 +19,7 @@
     "dist",
     "lib/**/*.d.ts"
   ],
+  "types": "lib/feathers/index.d.ts",
   "dependencies": {
     "actuate": "^1.9.0",
     "openfl": "^9.4.1"

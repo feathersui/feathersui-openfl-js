@@ -606,23 +606,41 @@ function startCreateLibCjsIndexModules() {
       let filePaths = dirToFiles[dir];
       let result = "module.exports = {\n";
       for (let path of filePaths) {
-        result += createFileIndexLine(dir, path);
+        result += createFileJSIndexLine(dir, path);
       }
       let packagePaths = dirToPackages[dir];
       if (packagePaths) {
         for (let path of packagePaths) {
-          result += createPackageIndexLine(dir, path);
+          result += createPackageJSIndexLine(dir, path);
         }
       }
       result += "}";
       delayFS.mkDirByPathSync(dir);
-      let indexFilePath = _path.resolve(dir, "index.js");
-      delayFS.writeFileSyncUTF8(indexFilePath, result, "index");
+      let indexJsFilePath = _path.resolve(dir, "index.js");
+      delayFS.writeFileSyncUTF8(indexJsFilePath, result, "index");
+    }
+
+    for (let dir in dirToFiles) {
+      let filePaths = dirToFiles[dir];
+      let result = "";
+      for (let path of filePaths) {
+        result += createFileTSIndexLine(dir, path);
+      }
+      let packagePaths = dirToPackages[dir];
+      if (packagePaths) {
+        for (let path of packagePaths) {
+          result += createPackageTSIndexLine(dir, path);
+        }
+      }
+      delayFS.mkDirByPathSync(dir);
+      let indexDtsFilePath = _path.resolve(dir, "index.d.ts");
+      console.log("**** " + indexDtsFilePath);
+      delayFS.writeFileSyncUTF8(indexDtsFilePath, result, "index");
     }
   });
 }
 
-function createFileIndexLine(indexDirPath, filePath) {
+function createFileJSIndexLine(indexDirPath, filePath) {
   let symbolName = _path.basename(filePath);
   symbolName = symbolName.substr(0, symbolName.length - 3);
   let relativePath = normalizePath(_path.relative(indexDirPath, filePath));
@@ -630,12 +648,27 @@ function createFileIndexLine(indexDirPath, filePath) {
   return `\t${symbolName}: require("./${relativePath}").default,\n`;
 }
 
-function createPackageIndexLine(indexDirPath, packageDirPath) {
+function createPackageJSIndexLine(indexDirPath, packageDirPath) {
   let symbolName = _path.basename(packageDirPath);
   let relativePath = normalizePath(
     _path.relative(indexDirPath, packageDirPath)
   );
   return `\t${symbolName}: require("./${relativePath}"),\n`;
+}
+
+function createFileTSIndexLine(indexDirPath, filePath) {
+  let symbolName = _path.basename(filePath);
+  symbolName = symbolName.substr(0, symbolName.length - 3);
+  let relativePath = normalizePath(_path.relative(indexDirPath, filePath));
+  relativePath = relativePath.substr(0, relativePath.length - 3);
+  return `export { default as ${symbolName} } from "./${relativePath}";\n`;
+}
+
+function createPackageTSIndexLine(indexDirPath, packageDirPath) {
+  let relativePath = normalizePath(
+    _path.relative(indexDirPath, packageDirPath)
+  );
+  return `export * from "./${relativePath}";\n`;
 }
 
 function createLibCjsModule(cjsPath, cjsGenPath) {
