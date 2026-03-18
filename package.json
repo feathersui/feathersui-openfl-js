@@ -16,7 +16,8 @@
   "homepage": "https://feathersui.com/",
   "main": "dist/feathersui-openfl.min.js",
   "files": [
-    "dist"
+    "dist",
+    "lib/**/*.d.ts"
   ],
   "dependencies": {
     "actuate": "^1.9.0",
