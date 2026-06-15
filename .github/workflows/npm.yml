@@ -24,3 +24,9 @@ jobs:
           path: feathersui-openfl-*.tgz
           archive: false
           if-no-files-found: error
+      - uses: actions/upload-artifact@v7
+        with:
+          name: feathersui-royale-typedefs
+          path: dist/feathersui-royale-typedefs.swc
+          archive: false
+          if-no-files-found: error
