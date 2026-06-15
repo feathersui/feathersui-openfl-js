@@ -2,8 +2,9 @@
 	"compilerOptions": {
 		"target": "ES2015",
 		"module": "CommonJS",
-		"moduleResolution": "node",
+		"moduleResolution": "bundler",
 		"noEmit": true,
+		"strict": true,
 		"paths": {
 			"openfl": ["../node_modules/openfl/lib/openfl"],
 			"openfl/*": ["../node_modules/openfl/lib/openfl/*"]

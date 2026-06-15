@@ -12,9 +12,10 @@ node generate-modules fix-npm-libs
 
 */
 
-const _fs = require("fs");
-const _path = require("path");
-const globby = require("globby");
+import * as fs from "node:fs";
+import * as path from "node:path";
+import { globby } from "globby";
+
 let DelayFS = init();
 let delayFS = new DelayFS(false);
 
@@ -22,13 +23,13 @@ let delayFS = new DelayFS(false);
 const libCjsDirname = "lib";
 const baseDir = "..";
 
-let srcDirPath = _path.resolve(
+let srcDirPath = path.resolve(
   baseDir,
-  _path.join("node_modules", "feathersui-openfl-haxelib", "src")
+  path.join("node_modules", "feathersui-openfl-haxelib", "src")
 );
-let srcFeathersDirPath = _path.resolve(srcDirPath, "feathers");
-let libCjsDirPath = _path.resolve(baseDir, libCjsDirname);
-let libCjsGenDirPath = _path.resolve(libCjsDirPath, "_gen");
+let srcFeathersDirPath = path.resolve(srcDirPath, "feathers");
+let libCjsDirPath = path.resolve(baseDir, libCjsDirname);
+let libCjsGenDirPath = path.resolve(libCjsDirPath, "_gen");
 
 // Convert windows paths to posix paths
 srcDirPath = normalizePath(srcDirPath);
@@ -159,10 +160,10 @@ function error() {
   console.log.apply(console, arguments);
 }
 
-function normalizePath(path) {
-  let segs = path.split(/[/\\]+/);
-  path = segs.join("/");
-  return path;
+function normalizePath(filePath) {
+  let segs = filePath.split(/[/\\]+/);
+  filePath = segs.join("/");
+  return filePath;
 }
 
 function init() {
@@ -217,13 +218,13 @@ function init() {
     }
 
     readFileSyncUTF8(filePath, extra) {
-      let fullFilePath = _path.resolve(filePath);
+      let fullFilePath = path.resolve(filePath);
 
       if (this.virtualFileSystem.has(fullFilePath)) {
         return this.virtualFileSystem.get(fullFilePath).content;
       }
 
-      let content = _fs.readFileSync(fullFilePath, "utf8");
+      let content = fs.readFileSync(fullFilePath, "utf8");
 
       let tags = null;
       if (typeof extra == "string") {
@@ -241,7 +242,7 @@ function init() {
     }
 
     writeFileSyncUTF8(filePath, content, extra) {
-      let fullFilePath = _path.resolve(filePath);
+      let fullFilePath = path.resolve(filePath);
 
       let createOnly = null;
 
@@ -289,11 +290,11 @@ function init() {
         }
 
         // Check if file we are saving already exists on the file system...
-        if (value.originalContent != null || _fs.existsSync(fullFilePath)) {
+        if (value.originalContent != null || fs.existsSync(fullFilePath)) {
           let originalContent;
 
           if (value.originalContent == null) {
-            originalContent = _fs.readFileSync(fullFilePath);
+            originalContent = fs.readFileSync(fullFilePath);
           } else {
             originalContent = value.originalContent;
           }
@@ -313,7 +314,7 @@ function init() {
 
             if (dryRun) {
             } else {
-              _fs.writeFileSync(fullFilePath, value.content, "utf8");
+              fs.writeFileSync(fullFilePath, value.content, "utf8");
             }
           }
         }
@@ -324,7 +325,7 @@ function init() {
 
           if (dryRun) {
           } else {
-            _fs.writeFileSync(fullFilePath, value.content, "utf8");
+            fs.writeFileSync(fullFilePath, value.content, "utf8");
           }
         }
       });
@@ -337,21 +338,21 @@ function init() {
     }
 
     _mkDirByPathSync(targetDir, dryRun, { isRelativeToScript = false } = {}) {
-      const sep = _path.posix.sep;
-      const initDir = _path.isAbsolute(targetDir) ? sep : "";
+      const sep = path.posix.sep;
+      const initDir = path.isAbsolute(targetDir) ? sep : "";
       const baseDir = isRelativeToScript ? __dirname : ".";
 
       let directoriesCreated = 0;
 
       targetDir.split(sep).reduce((parentDir, childDir) => {
-        const curDir = _path.resolve(baseDir, parentDir, childDir);
+        const curDir = path.resolve(baseDir, parentDir, childDir);
 
         if (this.directoriesThatExist.has(curDir)) {
           //console.log('exists1', curDir);
           return curDir;
         }
 
-        if (_fs.existsSync(curDir)) {
+        if (fs.existsSync(curDir)) {
           //console.log('exists2', curDir);
           this.directoriesThatExist.set(curDir, true);
           return curDir;
@@ -363,7 +364,7 @@ function init() {
             directoriesCreated++;
           } else {
             //info(curDir);
-            _fs.mkdirSync(curDir);
+            fs.mkdirSync(curDir);
           }
           this.directoriesThatExist.set(curDir, true);
         } catch (err) {
@@ -402,22 +403,22 @@ function init() {
       this.directoriesCreated += count;
     }
 
-    readFile(path, tags) {
-      this.read.push({ tags, path });
+    readFile(filePath, tags) {
+      this.read.push({ tags, path: filePath });
     }
 
-    addedFile(path, tags) {
+    addedFile(filePath, tags) {
       this.totalFilesAddedOrModified++;
-      this.added.push({ tags, path });
+      this.added.push({ tags, path: filePath });
     }
 
-    modifiedFile(path, tags) {
+    modifiedFile(filePath, tags) {
       this.totalFilesAddedOrModified++;
-      this.modified.push({ tags, path });
+      this.modified.push({ tags, path: filePath });
     }
 
-    unmodifiedFile(path, tags, ignored) {
-      this.unmodified.push({ tags, path, ignored });
+    unmodifiedFile(filePath, tags, ignored) {
+      this.unmodified.push({ tags, path: filePath, ignored });
     }
 
     toString() {
@@ -496,13 +497,18 @@ function init() {
 
 //generate lib and lib-esm
 
-function skipHxPath(path) {
-  if (path.indexOf("/macros/") !== -1) {
+/**
+ * 
+ * @param {string} filePath 
+ * @returns {boolean}
+ */
+function skipHxPath(filePath) {
+  if (filePath.indexOf("/macros/") !== -1) {
     return true;
   }
-  let symbolName = _path.basename(path);
+  let symbolName = path.basename(filePath);
   symbolName = symbolName.substr(0, symbolName.length - 3);
-  let content = _fs.readFileSync(path, "utf8");
+  let content = fs.readFileSync(filePath, "utf8");
   return (
     content.indexOf(`abstract ${symbolName}(`) !== -1 ||
     content.indexOf(`abstract ${symbolName}<`) !== -1
@@ -511,14 +517,14 @@ function skipHxPath(path) {
 
 function startCreateLibCjs() {
   return globby([
-    normalizePath(_path.resolve(srcFeathersDirPath, `**/*.hx`)),
+    normalizePath(path.resolve(srcFeathersDirPath, `**/*.hx`)),
   ]).then((paths) => {
-    for (let path of paths) {
-      if (skipHxPath(path)) {
+    for (let filePath of paths) {
+      if (skipHxPath(filePath)) {
         continue;
       }
 
-      let cjsFilePath = path
+      let cjsFilePath = filePath
         .replace(srcDirPath + "/", libCjsDirPath + "/")
         .replace(".hx", ".js");
       let cjsGenFilePath = cjsFilePath.replace(
@@ -528,33 +534,33 @@ function startCreateLibCjs() {
       let result = createLibCjsModule(cjsFilePath, cjsGenFilePath);
       // change: "../src/openfl/display/Sprite.hx" to "../lib/openfl/display/Sprite.js"
 
-      delayFS.mkDirByPathSync(_path.dirname(cjsFilePath));
+      delayFS.mkDirByPathSync(path.dirname(cjsFilePath));
       delayFS.writeFileSyncUTF8(cjsFilePath, result, "cjs-module");
 
-      let fileName = _path.basename(path);
+      let fileName = path.basename(filePath);
       fileName = fileName.substr(0, fileName.length - 3);
-      let content = _fs.readFileSync(path, "utf8");
+      let content = fs.readFileSync(filePath, "utf8");
       let findClasses = /^class (\w+)/gm;
       let foundOtherClasses;
       while ((foundOtherClasses = findClasses.exec(content))) {
         let otherClassName = foundOtherClasses[1];
         if (fileName != otherClassName) {
-          cjsFilePath = _path.resolve(
-            _path.dirname(cjsFilePath),
+          cjsFilePath = path.resolve(
+            path.dirname(cjsFilePath),
             `${otherClassName}.js`
           );
-          cjsGenFilePath = _path.resolve(
-            _path.dirname(cjsGenFilePath),
+          cjsGenFilePath = path.resolve(
+            path.dirname(cjsGenFilePath),
             `${otherClassName}.js`
           );
-          if (!_fs.existsSync(cjsGenFilePath)) {
+          if (!fs.existsSync(cjsGenFilePath)) {
             //if the file doesn't exist, skip it
             //it's probably in a conditional compilation block
             continue;
           }
           console.log(cjsGenFilePath);
           let result = createLibCjsModule(cjsFilePath, cjsGenFilePath);
-          delayFS.mkDirByPathSync(_path.dirname(cjsFilePath));
+          delayFS.mkDirByPathSync(path.dirname(cjsFilePath));
           delayFS.writeFileSyncUTF8(cjsFilePath, result, "cjs-module");
         }
       }
@@ -564,27 +570,27 @@ function startCreateLibCjs() {
 
 function startCreateLibCjsIndexModules() {
   return globby([
-    normalizePath(_path.resolve(libCjsDirPath, "feathers", "**/*.js")),
+    normalizePath(path.resolve(libCjsDirPath, "feathers", "**/*.js")),
   ]).then((paths) => {
-    let indexDirPath = normalizePath(_path.resolve(libCjsDirPath, "feathers"));
+    let indexDirPath = normalizePath(path.resolve(libCjsDirPath, "feathers"));
     let dirToFiles = {};
     let dirToPackages = {};
     dirToFiles[indexDirPath] = new Set();
     dirToPackages[indexDirPath] = new Set();
-    for (let path of paths) {
-      if (_path.basename(path) === "index.js") {
+    for (let filePath of paths) {
+      if (path.basename(filePath) === "index.js") {
         //skip any existing index files
         continue;
       }
 
       //add to folder index.js
-      let dirName = _path.dirname(path);
+      let dirName = path.dirname(filePath);
       if (!dirToFiles.hasOwnProperty(dirName)) {
         dirToFiles[dirName] = new Set();
       }
-      dirToFiles[dirName].add(path);
+      dirToFiles[dirName].add(filePath);
 
-      let dirNameDirName = _path.dirname(dirName);
+      let dirNameDirName = path.dirname(dirName);
       if (!dirToPackages.hasOwnProperty(dirNameDirName)) {
         dirToPackages[dirNameDirName] = new Set();
       }
@@ -595,7 +601,7 @@ function startCreateLibCjsIndexModules() {
         dirToFiles[dirNameDirName] = new Set();
       }
 
-      let dirNameDirNameDirName = _path.dirname(dirNameDirName);
+      let dirNameDirNameDirName = path.dirname(dirNameDirName);
       if (!dirToPackages.hasOwnProperty(dirNameDirNameDirName)) {
         dirToPackages[dirNameDirNameDirName] = new Set();
       }
@@ -616,7 +622,7 @@ function startCreateLibCjsIndexModules() {
       }
       result += "}";
       delayFS.mkDirByPathSync(dir);
-      let indexJsFilePath = _path.resolve(dir, "index.js");
+      let indexJsFilePath = path.resolve(dir, "index.js");
       delayFS.writeFileSyncUTF8(indexJsFilePath, result, "index");
     }
 
@@ -633,7 +639,7 @@ function startCreateLibCjsIndexModules() {
         }
       }
       delayFS.mkDirByPathSync(dir);
-      let indexDtsFilePath = _path.resolve(dir, "index.d.ts");
+      let indexDtsFilePath = path.resolve(dir, "index.d.ts");
       console.log("**** " + indexDtsFilePath);
       delayFS.writeFileSyncUTF8(indexDtsFilePath, result, "index");
     }
@@ -641,39 +647,39 @@ function startCreateLibCjsIndexModules() {
 }
 
 function createFileJSIndexLine(indexDirPath, filePath) {
-  let symbolName = _path.basename(filePath);
+  let symbolName = path.basename(filePath);
   symbolName = symbolName.substr(0, symbolName.length - 3);
-  let relativePath = normalizePath(_path.relative(indexDirPath, filePath));
+  let relativePath = normalizePath(path.relative(indexDirPath, filePath));
   relativePath = relativePath.substr(0, relativePath.length - 3);
   return `\t${symbolName}: require("./${relativePath}").default,\n`;
 }
 
 function createPackageJSIndexLine(indexDirPath, packageDirPath) {
-  let symbolName = _path.basename(packageDirPath);
+  let symbolName = path.basename(packageDirPath);
   let relativePath = normalizePath(
-    _path.relative(indexDirPath, packageDirPath)
+    path.relative(indexDirPath, packageDirPath)
   );
   return `\t${symbolName}: require("./${relativePath}"),\n`;
 }
 
 function createFileTSIndexLine(indexDirPath, filePath) {
-  let symbolName = _path.basename(filePath);
+  let symbolName = path.basename(filePath);
   symbolName = symbolName.substr(0, symbolName.length - 3);
-  let relativePath = normalizePath(_path.relative(indexDirPath, filePath));
+  let relativePath = normalizePath(path.relative(indexDirPath, filePath));
   relativePath = relativePath.substr(0, relativePath.length - 3);
   return `export { default as ${symbolName} } from "./${relativePath}";\n`;
 }
 
 function createPackageTSIndexLine(indexDirPath, packageDirPath) {
   let relativePath = normalizePath(
-    _path.relative(indexDirPath, packageDirPath)
+    path.relative(indexDirPath, packageDirPath)
   );
   return `export * from "./${relativePath}";\n`;
 }
 
 function createLibCjsModule(cjsPath, cjsGenPath) {
   let relativePath = normalizePath(
-    _path.relative(_path.dirname(cjsPath), cjsGenPath)
+    path.relative(path.dirname(cjsPath), cjsGenPath)
   );
   relativePath = relativePath.substr(0, relativePath.length - 3);
   return `module.exports = require("./${relativePath}");`;
@@ -681,13 +687,13 @@ function createLibCjsModule(cjsPath, cjsGenPath) {
 
 function startFixNpmLibsGenCjs() {
   return globby([
-    normalizePath(_path.resolve(srcFeathersDirPath, `**/*.hx`)),
+    normalizePath(path.resolve(srcFeathersDirPath, `**/*.hx`)),
   ]).then((paths) => {
-    for (let path of paths) {
-      if (skipHxPath(path)) {
+    for (let filePath of paths) {
+      if (skipHxPath(filePath)) {
         continue;
       }
-      let cjsFilePath = path
+      let cjsFilePath = filePath
         .replace(srcDirPath + "/", libCjsDirPath + "/")
         .replace(".hx", ".js");
       let cjsGenFilePath = cjsFilePath.replace(
@@ -696,20 +702,21 @@ function startFixNpmLibsGenCjs() {
       );
       let result = processCjsModule(cjsGenFilePath);
 
-      delayFS.mkDirByPathSync(_path.dirname(cjsGenFilePath));
+      delayFS.mkDirByPathSync(path.dirname(cjsGenFilePath));
       delayFS.writeFileSyncUTF8(cjsGenFilePath, result, "cjs-module");
     }
   });
 }
 
 function processCjsModule(moduleFilePath) {
-  let content = _fs.readFileSync(moduleFilePath, "utf8");
+  let content = fs.readFileSync(moduleFilePath, "utf8");
 
   var libraryNamespaces = ["openfl", "motion"];
   for (let ns of libraryNamespaces) {
     let findRequire = new RegExp(
       `require\\(\"\\.\\/(?:\\.\\.\\/)*${ns}\\/(.*)\"\\)`
     );
+    let result;
     while ((result = content.match(findRequire))) {
       var newRequire = `require("${ns}").` + result[1].replace(/\//g, ".");
       content =
